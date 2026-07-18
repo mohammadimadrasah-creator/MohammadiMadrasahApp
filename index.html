@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="ps" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>د محمدي مدرسې د زده کونکو د معلوماتو سیستم</title>
+
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jomhuria&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-color: #06261f;
+      --accent-color: #c2991b;
+      --bg-color: #edf2ee;
+      --card-bg: #ffffff;
+      --important-row-bg: #0f3d59;
+      --btn-danger-bg: #a91e1e;
+      --error-bg-color: #d32f2f;
+      --success-bg-color: #2e7d32;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Vazirmatn', sans-serif;
+      background-color: var(--bg-color);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 25px;
+      background-image: radial-gradient(rgba(194, 153, 27, 0.15) 1px, transparent 1px),
+                        radial-gradient(rgba(194, 153, 27, 0.15) 1px, var(--bg-color) 1px);
+      background-size: 24px 24px;
+      background-position: 0 0, 12px 12px;
+      overflow-x: hidden;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 2100px;
+      background: var(--card-bg);
+      border-radius: 30px;
+      box-shadow: 0 10px 30px rgba(6, 38, 31, 0.05), 0 30px 70px rgba(6, 38, 31, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      border-top: 30px solid var(--primary-color);
+      border-bottom: 30px solid var(--primary-color);
+      border-right: 6px solid var(--accent-color);
+      border-left: 6px solid var(--accent-color);
+      outline: 2px solid var(--primary-color);
+      outline-offset: -8px;
+      padding: 15px 40px 30px 40px;
+      transition: all 0.4s ease;
+    }
+
+    .app-page {
+      display: none;
+      opacity: 0;
+      filter: blur(15px);
+      transform: translateY(40px) scale(0.93) rotateX(-5deg);
+      transform-style: preserve-3d;
+      perspective: 1000px;
+      transition: opacity 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .app-page.page-active { display: block !important; opacity: 1; filter: blur(0); transform: translateY(0) scale(1) rotateX(0deg); }
+
+    .header-layout-table { width: 100%; border-collapse: collapse; margin: 10px 0; table-layout: fixed; }
+    .header-layout-table td { border: none !important; background: transparent !important; padding: 0 !important; vertical-align: middle !important; }
+    .slogan-box { width: 36%; font-family: 'Amiri', serif; font-weight: 700; color: var(--primary-color); line-height: 1.4 !important; text-align: center; direction: rtl; }
+    .typewriter-text { display: inline-block; white-space: normal !important; word-wrap: break-word !important; width: 100%; text-align: center; direction: rtl; opacity: 0; font-size: 38px; animation: smoothShow 8s ease-in-out infinite; }
+    .slogan-left .typewriter-text { animation-delay: 0.5s; }
+    @keyframes smoothShow { 0% { opacity: 0; transform: translateX(15px); filter: blur(4px); } 35%, 85% { opacity: 1; transform: translateX(0); filter: blur(0); } 100% { opacity: 0; transform: translateX(-15px); filter: blur(4px); } }
+    .logo-center-container { width: 28%; text-align: center; vertical-align: middle; }
+    .logo-img { width: 220px; height: 220px; object-fit: contain; filter: drop-shadow(0 8px 16px rgba(6, 38, 31, 0.18)); }
+
+    .header-table-box { width: 100%; margin: 0 0 30px 0; background: linear-gradient(135deg, var(--primary-color), #031411); padding: 20px; text-align: center; border: 4px double var(--accent-color); border-radius: 14px; }
+    .header-table-box h2 { font-family: 'Jomhuria', serif; color: var(--accent-color); margin: 0; font-size: 50px; font-weight: 400; line-height: 1.1; }
+    .header-table-box .sub-title { color: #ffffff; font-size: 16px; font-weight: 600; margin-top: 8px; }
+
+    .form-group { display: flex; flex-direction: column; gap: 25px; margin-bottom: 25px; background: #f7f9f7; padding: 35px; border-radius: 16px; border: 2px solid #dce5df; }
+    .input-box { display: flex; flex-direction: column; }
+    label { font-size: 22px; font-weight: 800; color: var(--primary-color); margin-bottom: 10px; }
+    input, textarea { padding: 16px 20px; border: 3px solid #b2c4ba; border-radius: 12px; font-family: 'Vazirmatn', sans-serif; font-size: 22px; outline: none; text-align: center; background-color: #ffffff; color: var(--primary-color); font-weight: 700; transition: all 0.3s ease; }
+    input:focus, textarea:focus { border-color: var(--accent-color); box-shadow: 0 0 12px rgba(194, 153, 27, 0.25); }
+    input.input-invalid { border-color: var(--error-bg-color); }
+    .hint-text { font-size: 14px; color: #5c6a62; margin-top: 6px; font-weight: 700; text-align: center; }
+
+    .btn-search, .btn-submit-text { width: 100%; padding: 20px; background: linear-gradient(135deg, var(--primary-color), #0b4237); color: white; border: 2px solid var(--accent-color); border-radius: 12px; font-family: 'Vazirmatn', sans-serif; font-size: 24px; font-weight: 800; cursor: pointer; box-shadow: 0 6px 15px rgba(6, 38, 31, 0.2); margin-top: 10px; transition: all 0.2s ease; }
+    .btn-search:hover, .btn-submit-text:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(6, 38, 31, 0.3); }
+    .btn-search:disabled, .btn-submit-text:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+    .btn-clear-wrapper { display: flex; justify-content: center; width: 100%; margin-top: 5px; }
+    .btn-clear { padding: 10px 20px; background: #e5e9e6; color: #a91e1e; border: 2px solid #b2c4ba; border-radius: 10px; font-family: 'Vazirmatn', sans-serif; font-size: 16px; font-weight: 800; cursor: pointer; }
+
+    #loading, #loading-submit, #loading-section { display: none; text-align: center; margin: 20px 0; color: var(--primary-color); font-weight: 900; font-size: 22px; }
+    .animated-dots span { display: inline-block; animation: realTimeDots 1.4s infinite both; font-size: 26px; }
+    @keyframes realTimeDots { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
+
+    #error-msg, #result-page-msg { display: none; background-color: var(--error-bg-color); color: #ffffff; padding: 18px; border-radius: 12px; margin-bottom: 20px; text-align: center; border: 2.5px solid var(--accent-color); font-weight: 800; font-size: 20px; }
+    #result-page-msg { margin-top: 15px; margin-bottom: 10px; }
+
+    .menu-group { display: flex; flex-direction: column; gap: 20px; margin-bottom: 25px; background: #f7f9f7; padding: 35px; border-radius: 16px; border: 2px solid #dce5df; }
+    .btn-menu-opt { width: 100%; padding: 22px; background: linear-gradient(135deg, #114b3e, var(--primary-color)); color: #ffffff; border: 3px solid var(--accent-color); border-radius: 14px; font-family: 'Vazirmatn', sans-serif; font-size: 24px; font-weight: 800; cursor: pointer; box-shadow: 0 6px 15px rgba(6, 38, 31, 0.15); transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); position: relative; overflow: hidden; }
+    .btn-menu-opt:hover { background: linear-gradient(135deg, var(--accent-color), #a37f13); color: #000000; transform: translateY(-4px) scale(1.02); box-shadow: 0 15px 30px rgba(194, 153, 27, 0.4); }
+    .btn-menu-opt:active { transform: scale(0.97) translateY(2px); box-shadow: 0 5px 10px rgba(0,0,0,0.2); }
+    .btn-menu-opt.btn-clicked { animation: pulseGlow 0.4s ease-out; }
+    @keyframes pulseGlow { 0% { transform: scale(1); } 50% { transform: scale(0.95); box-shadow: 0 0 25px var(--accent-color); } 100% { transform: scale(1); } }
+
+    .table-title { color: var(--primary-color); font-size: 24px; font-weight: 900; margin-bottom: 20px; border-bottom: 3px solid var(--accent-color); padding-bottom: 8px; display: inline-block; }
+    .match-block { margin-bottom: 35px; }
+    .match-label { display: inline-block; background: var(--accent-color); color: #06261f; font-weight: 900; font-size: 18px; padding: 6px 18px; border-radius: 20px; margin-bottom: 12px; }
+
+    .luxury-table { width: 100%; border-collapse: separate; border-spacing: 0 10px; margin-bottom: 10px; }
+    .luxury-table tr { transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1); cursor: pointer; }
+    .luxury-table tr:nth-child(even) td { background-color: #f5f8f6; }
+    .luxury-table tr:nth-child(odd) td { background-color: #eaf0ec; }
+    .luxury-table tr td:first-child { border-top-right-radius: 12px; border-bottom-right-radius: 12px; border-right: 2px solid #cedbd3; }
+    .luxury-table tr td:last-child { border-top-left-radius: 12px; border-bottom-left-radius: 12px; border-left: 2px solid #cedbd3; }
+    .luxury-table tr:hover td { background-color: #F0EAD6 !important; color: #000000 !important; }
+    .luxury-table td { padding: 14px 12px !important; font-family: 'Vazirmatn', sans-serif !important; font-size: 21px !important; font-weight: 700 !important; border-top: 1px solid #cedbd3; border-bottom: 1px solid #cedbd3; text-align: center !important; transition: all 0.2s ease; }
+    .td-header { background-color: var(--primary-color) !important; color: #ffffff !important; width: 50%; }
+    .td-value { color: #031411; }
+
+    .ae-submission-box { background: #f4f7f5; padding: 25px; border-radius: 16px; border: 2px solid #b2c4ba; margin-bottom: 25px; display: flex; flex-direction: column; gap: 12px; }
+    .ae-submission-box label { font-size: 20px; text-align: right; }
+    .ae-submission-box textarea { width: 100%; height: 100px; resize: none; font-size: 18px; text-align: right; }
+    .char-counter { font-size: 12px; color: #5c6a62; text-align: left; }
+
+    .btn-back { width: 100%; padding: 18px; background: linear-gradient(135deg, var(--btn-danger-bg), #7f1414); color: #ffffff !important; border: 2px solid var(--accent-color); border-radius: 12px; font-family: 'Vazirmatn', sans-serif; font-size: 20px; font-weight: 800; cursor: pointer; margin-top: 10px; }
+
+    @media (max-width: 600px) {
+      body { padding: 0; align-items: flex-start; }
+      .container { margin: 0; width: 100%; max-width: 100%; min-height: 100vh; border-radius: 0; border-top: 20px solid var(--primary-color); border-bottom: 20px solid var(--primary-color); border-right: 10px solid var(--accent-color); border-left: 10px solid var(--accent-color); outline-offset: -5px; padding: 12px 15px; }
+      .header-layout-table { display: table !important; }
+      .slogan-box { display: table-cell !important; width: 35% !important; vertical-align: middle !important; }
+      .logo-center-container { display: table-cell !important; width: 30% !important; }
+      .logo-img { width: 100px; height: 100px; }
+      .typewriter-text { font-size: 15px !important; line-height: 1.3 !important; }
+      .header-table-box { padding: 12px 10px; margin-bottom: 20px; }
+      .header-table-box h2 { font-size: 30px; }
+      .form-group, .ae-submission-box, .menu-group { padding: 20px 15px; gap: 15px; }
+      label { font-size: 16px; }
+      input, textarea { padding: 12px; font-size: 18px; }
+      .btn-search, .btn-back, .btn-clear, .btn-submit-text, .btn-menu-opt { padding: 14px; font-size: 17px; }
+      .table-title { font-size: 16px; }
+      .luxury-table td { padding: 12px 6px !important; font-size: 13px !important; }
+      #error-msg, #result-page-msg { font-size: 15px; padding: 12px; }
+    }
+
+    .selected-row td { background-color: #c2991b !important; color: #ffffff !important; transform: scale(0.99); box-shadow: inset 0 0 10px rgba(0,0,0,0.2); }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <table class="header-layout-table">
+      <tr>
+        <td class="slogan-box slogan-right"><div class="typewriter-text">علم د مؤمن تر ټولو<br>ستره شتمني ده</div></td>
+        <td class="logo-center-container"><img src="https://i.postimg.cc/HWVf6r64/mhmdy-mdrsh.png" alt="د محمدی مدرسې لوګو" class="logo-img"></td>
+        <td class="slogan-box slogan-left"><div class="typewriter-text">د زده کوونکو بریا<br>زموږ هیله ده</div></td>
+      </tr>
+    </table>
+
+    <div class="header-table-box">
+      <h2>د محمدي مدرسې د زده کونکو د معلوماتو سیستم</h2>
+      <div class="sub-title">❖ ټول معلومات یوځای، ژر او امن ❖</div>
+    </div>
+
+    <div id="error-msg"></div>
+
+    <!-- ۱) د ننوتلو پاڼه -->
+    <div id="searchPage" class="app-page page-active">
+      <div class="form-group">
+        <div class="input-box">
+          <label for="basisNum">د زده کونکي اساس شمیره ولیکئ:</label>
+          <input type="text" id="basisNum" inputmode="numeric" autocomplete="off" placeholder="مثلاً: 1234" onkeydown="handleBasisEnter(event)" required>
+          <div class="hint-text">اساس شمېره یوازې په عددونو باندې ولیکئ</div>
+        </div>
+        <div class="input-box">
+          <label for="studentCode">شپږ رقمي پسورډ یا کوډ ولیکئ:</label>
+          <input type="password" id="studentCode" inputmode="numeric" autocomplete="off" placeholder="••••••" maxlength="6" onkeydown="handleCodeEnter(event)" required>
+        </div>
+      </div>
+      <div class="btn-clear-wrapper"><button class="btn-clear" onclick="clearFormFields()">پاکول</button></div>
+      <button class="btn-search" id="btn-search" onclick="getStudentInfo()">ننوتل</button>
+      <div id="loading">❖ د معلوماتو د لټون په حال کې<span class="animated-dots"><span>.</span><span>.</span><span>.</span></span></div>
+    </div>
+
+    <!-- ۲) اصلي منو (۶ برخې) -->
+    <div id="menuPage" class="app-page">
+      <div class="menu-group">
+        <button class="btn-menu-opt" onclick="animateAndSelectSection('profile', this)">۱. د زده کوونکي مشخصات</button>
+        <button class="btn-menu-opt" onclick="animateAndSelectSection('fee', this)">۲. فیس</button>
+        <button class="btn-menu-opt" onclick="animateAndSelectSection('monthly', this)">۳. میاشتنۍ ارزونه</button>
+        <button class="btn-menu-opt" onclick="animateAndSelectSection('examGrades', this)">۴. د آزموینې نمرات</button>
+        <button class="btn-menu-opt" onclick="animateAndSelectSection('attendance', this)">۵. سوبتیا</button>
+        <button class="btn-menu-opt" onclick="animateAndSelectSection('quarterly', this)">۶. څلور میاشتینۍ ارزونه</button>
+      </div>
+      <button class="btn-back" onclick="goBackToSearch()">له سیسټم څخه وتل</button>
+      <div id="loading-section">❖ د معلوماتو د لټون په حال کې<span class="animated-dots"><span>.</span><span>.</span><span>.</span></span></div>
+    </div>
+
+    <!-- ۳) د فصل انتخاب (یوازې د ۶م برخې لپاره) -->
+    <div id="quarterlyFaslPage" class="app-page">
+      <div class="menu-group">
+        <button class="btn-menu-opt" onclick="selectQuarter('q1', this)">لومړۍ فصل</button>
+        <button class="btn-menu-opt" onclick="selectQuarter('q2', this)">دویم فصل</button>
+        <button class="btn-menu-opt" onclick="selectQuarter('q3', this)">دریم فصل</button>
+      </div>
+      <button class="btn-back" onclick="goBackToMenu()">مخکینۍ صفحې ته تګ</button>
+    </div>
+
+    <!-- ۴) د نمایش ډول انتخاب (تفصیل / خلاصه) -->
+    <div id="quarterlyViewPage" class="app-page">
+      <div class="menu-group">
+        <button class="btn-menu-opt" onclick="animateAndSelectView('full', this)">د نمراتو تفصیل</button>
+        <button class="btn-menu-opt" onclick="animateAndSelectView('summary', this)">د نمراتو خلاصه</button>
+      </div>
+      <button class="btn-back" onclick="goBackToQuarterlyFasl()">مخکینۍ صفحې ته تګ</button>
+      <div id="loading-quarterly">❖ د معلوماتو د لټون په حال کې<span class="animated-dots"><span>.</span><span>.</span><span>.</span></span></div>
+    </div>
+
+    <!-- ۵) د پایلو پاڼه -->
+    <div id="resultPage" class="app-page">
+      <div class="table-title" id="pageTitle">❖ پایلې ❖</div>
+      <div id="resultsContainer"></div>
+
+      <div class="ae-submission-box">
+        <label for="aeText">خپل ارزښتمند نظریات مو لاندې ولیکئ:</label>
+        <textarea id="aeText" maxlength="500" placeholder="خپل نظر دلته ولیکئ..." oninput="updateCharCounter()"></textarea>
+        <div class="char-counter" id="charCounter">0 / 500</div>
+        <button class="btn-submit-text" id="btn-submit-text" onclick="submitToAEColumn()">د معلوماتو لیږل او ثبتول</button>
+        <div id="loading-submit">❖ هیله ده منتظر شئ<span class="animated-dots"><span>.</span><span>.</span><span>.</span></span></div>
+        <div id="result-page-msg"></div>
+      </div>
+
+      <button class="btn-back" onclick="goBackFromResult()">مخکینۍ صفحې ته تګ</button>
+    </div>
+
+  </div>
+
+  <script>
+    var webAppUrl = "PASTE_YOUR_NEW_EXEC_LINK_HERE";
+
+    var currentBasisNum = "";
+    var sessionToken = null;
+    var currentSection = null;   // 'profile' | 'fee' | 'monthly' | 'examGrades' | 'attendance' | 'quarterly'
+    var currentQuarter = null;   // 'q1' | 'q2' | 'q3'
+    var resultOrigin = null;     // پته چیرته باید له پایلو څخه بیرته لاړ شو
+
+    var SECTION_TITLES = {
+      profile: "❖ د زده کونکي مشخصات ❖",
+      fee: "❖ د زده کونکي فیس ❖",
+      monthly: "❖ میاشتنۍ ارزونه ❖",
+      examGrades: "❖ د آزموینې نمرات ❖",
+      attendance: "❖ سوبتیا ❖",
+      quarterly: "❖ څلور میاشتینۍ ارزونه ❖"
+    };
+
+    // ------- مرستندویه فنکشنونه -------
+
+    function isValidBasisNumber(v) { return /^[0-9]{1,10}$/.test(v); }
+    function isValidCode(v) { return /^[0-9]{6}$/.test(v); }
+
+    function fetchWithTimeout(url, options, ms) {
+      var controller = new AbortController();
+      var id = setTimeout(function () { controller.abort(); }, ms || 20000);
+      return fetch(url, Object.assign({}, options, { signal: controller.signal })).finally(function () { clearTimeout(id); });
+    }
+
+    function showError(msg) {
+      var errorMsg = document.getElementById('error-msg');
+      errorMsg.innerText = msg;
+      errorMsg.style.display = 'block';
+    }
+    function hideError() { document.getElementById('error-msg').style.display = 'none'; }
+
+    function switchPage(fromPageId, toPageId) {
+      var fromPage = document.getElementById(fromPageId);
+      var toPage = document.getElementById(toPageId);
+      fromPage.classList.remove('page-active');
+      setTimeout(function () {
+        fromPage.style.display = 'none';
+        toPage.style.display = 'block';
+        setTimeout(function () { toPage.classList.add('page-active'); }, 20);
+      }, 500);
+    }
+
+    function handleBasisEnter(event) { if (event.key === 'Enter') { event.preventDefault(); document.getElementById('studentCode').focus(); } }
+    function handleCodeEnter(event) { if (event.key === 'Enter') { event.preventDefault(); getStudentInfo(); } }
+
+    function clearFormFields() {
+      document.getElementById('basisNum').value = '';
+      document.getElementById('studentCode').value = '';
+      document.getElementById('basisNum').classList.remove('input-invalid');
+      document.getElementById('studentCode').classList.remove('input-invalid');
+      hideError();
+      document.getElementById('basisNum').focus();
+      sessionToken = null;
+    }
+
+    function updateCharCounter() {
+      document.getElementById('charCounter').innerText = document.getElementById('aeText').value.length + ' / 500';
+    }
+
+    // ------- ننوتل -------
+
+    function getStudentInfo() {
+      var basisInput = document.getElementById('basisNum');
+      var codeInput = document.getElementById('studentCode');
+      var basisNum = basisInput.value.trim();
+      var studentCode = codeInput.value.trim();
+      var loading = document.getElementById('loading');
+      var btn = document.getElementById('btn-search');
+
+      hideError();
+      basisInput.classList.remove('input-invalid');
+      codeInput.classList.remove('input-invalid');
+
+      var invalid = false;
+      if (!isValidBasisNumber(basisNum)) { basisInput.classList.add('input-invalid'); invalid = true; }
+      if (!isValidCode(studentCode)) { codeInput.classList.add('input-invalid'); invalid = true; }
+      if (invalid) { showError('هیله ده اساس شمیره (عددونه) او شپږ رقمي کوډ سم دننه کړئ.'); return; }
+
+      loading.style.display = 'block';
+      btn.disabled = true;
+      currentBasisNum = basisNum;
+
+      fetchWithTimeout(webAppUrl, {
+        method: "POST", mode: "cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "login", basisNumber: basisNum, studentCode: studentCode })
+      }, 20000)
+      .then(function (res) { return res.json(); })
+      .then(function (response) {
+        loading.style.display = 'none';
+        btn.disabled = false;
+        if (response.success) {
+          sessionToken = response.token;
+          switchPage('searchPage', 'menuPage');
+        } else {
+          showError(response.message || 'معلومات سم نه دي.');
+        }
+      })
+      .catch(function (err) {
+        loading.style.display = 'none';
+        btn.disabled = false;
+        showError(err && err.name === 'AbortError' ? 'د سرور ځواب ډیر ځنډ وکړ. بیا هڅه وکړئ.' : 'له سرور سره په اړیکه کې ستونزه رامنځته شوه.');
+        console.error(err);
+      });
+    }
+
+    // ------- منتخب کول برخه -------
+
+    function animateAndSelectSection(section, buttonElement) {
+      buttonElement.classList.add('btn-clicked');
+      setTimeout(function () {
+        buttonElement.classList.remove('btn-clicked');
+        currentSection = section;
+        if (section === 'quarterly') {
+          switchPage('menuPage', 'quarterlyFaslPage');
+        } else {
+          resultOrigin = 'menuPage';
+          fetchSectionData({ section: section });
+        }
+      }, 250);
+    }
+
+    function selectQuarter(qKey, buttonElement) {
+      buttonElement.classList.add('btn-clicked');
+      setTimeout(function () {
+        buttonElement.classList.remove('btn-clicked');
+        currentQuarter = qKey;
+        switchPage('quarterlyFaslPage', 'quarterlyViewPage');
+      }, 250);
+    }
+
+    function animateAndSelectView(viewType, buttonElement) {
+      buttonElement.classList.add('btn-clicked');
+      setTimeout(function () {
+        buttonElement.classList.remove('btn-clicked');
+        resultOrigin = 'quarterlyViewPage';
+        fetchSectionData({ section: 'quarterly', quarter: currentQuarter, view: viewType });
+      }, 250);
+    }
+
+    // ------- ډاټا راوړل -------
+
+    function fetchSectionData(extra) {
+      var loadingId = (resultOrigin === 'quarterlyViewPage') ? 'loading-quarterly' : 'loading-section';
+      var loadingEl = document.getElementById(loadingId);
+      loadingEl.style.display = 'block';
+      hideError();
+
+      var payload = Object.assign({ action: "getSection", basisNumber: currentBasisNum, token: sessionToken }, extra);
+
+      fetchWithTimeout(webAppUrl, {
+        method: "POST", mode: "cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      }, 25000)
+      .then(function (res) { return res.json(); })
+      .then(function (response) {
+        loadingEl.style.display = 'none';
+        if (response.success) {
+          renderResults(response);
+          var fromPage = resultOrigin === 'quarterlyViewPage' ? 'quarterlyViewPage' : 'menuPage';
+          switchPage(fromPage, 'resultPage');
+        } else {
+          showError(response.message || 'معلومات ونه موندل شول.');
+        }
+      })
+      .catch(function (err) {
+        loadingEl.style.display = 'none';
+        showError('له سرور سره په اړیکه کې ستونزه رامنځته شوه. بیا هڅه وکړئ.');
+        console.error(err);
+      });
+    }
+
+    function renderResults(response) {
+      var pageTitle = document.getElementById('pageTitle');
+      var container = document.getElementById('resultsContainer');
+      pageTitle.innerText = SECTION_TITLES[currentSection] || "❖ پایلې ❖";
+      container.innerHTML = '';
+
+      if (response.matches) {
+        // ډیری پایلې (لکه میاشتنۍ ارزونه یا سوبتیا)
+        response.matches.forEach(function (match, idx) {
+          var block = document.createElement('div');
+          block.className = 'match-block';
+
+          var label = document.createElement('div');
+          label.className = 'match-label';
+          label.textContent = (idx + 1) + '. ' + match.label;
+          block.appendChild(label);
+
+          block.appendChild(buildTable(match.data));
+          container.appendChild(block);
+        });
+      } else if (response.data) {
+        container.appendChild(buildTable(response.data));
+      }
+    }
+
+    function buildTable(items) {
+      var table = document.createElement('table');
+      table.className = 'luxury-table';
+      var frag = document.createDocumentFragment();
+      items.forEach(function (item) {
+        var tr = document.createElement('tr');
+        tr.onclick = function () { selectRow(tr); };
+        var tdHeader = document.createElement('td');
+        tdHeader.className = 'td-header';
+        tdHeader.textContent = item.header;
+        var tdValue = document.createElement('td');
+        tdValue.className = 'td-value';
+        tdValue.textContent = item.value;
+        tr.appendChild(tdHeader);
+        tr.appendChild(tdValue);
+        frag.appendChild(tr);
+      });
+      table.appendChild(frag);
+      return table;
+    }
+
+    function selectRow(row) {
+      var rows = document.querySelectorAll('.luxury-table tr');
+      rows.forEach(function (r) { r.classList.remove('selected-row'); });
+      row.classList.add('selected-row');
+    }
+
+    // ------- نظریات -------
+
+    function submitToAEColumn() {
+      var aeText = document.getElementById('aeText').value.trim();
+      var msgBox = document.getElementById('result-page-msg');
+      var loadingSubmit = document.getElementById('loading-submit');
+      var btn = document.getElementById('btn-submit-text');
+
+      msgBox.style.display = 'none';
+
+      if (!aeText) { msgBox.innerText = "هیله ده لومړی متن ولیکئ."; msgBox.style.backgroundColor = "var(--error-bg-color)"; msgBox.style.display = "block"; return; }
+      if (aeText.length > 500) { msgBox.innerText = "متن باید تر ۵۰۰ حرفو زیات نه وي."; msgBox.style.backgroundColor = "var(--error-bg-color)"; msgBox.style.display = "block"; return; }
+
+      loadingSubmit.style.display = "block";
+      btn.disabled = true;
+
+      fetchWithTimeout(webAppUrl, {
+        method: "POST", mode: "cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "submitComment", basisNumber: currentBasisNum, token: sessionToken, newText: aeText })
+      }, 20000)
+      .then(function (res) { return res.json(); })
+      .then(function (response) {
+        loadingSubmit.style.display = "none";
+        btn.disabled = false;
+        msgBox.innerText = response.message;
+        msgBox.style.display = "block";
+        if (response.success) {
+          msgBox.style.backgroundColor = "var(--success-bg-color)";
+          document.getElementById('aeText').value = '';
+          updateCharCounter();
+        } else {
+          msgBox.style.backgroundColor = "var(--error-bg-color)";
+        }
+      })
+      .catch(function (err) {
+        loadingSubmit.style.display = "none";
+        btn.disabled = false;
+        msgBox.innerText = "د معلوماتو په لیږلو کې تېروتنه رامنځته شوه.";
+        msgBox.style.backgroundColor = "var(--error-bg-color)";
+        msgBox.style.display = "block";
+        console.error(err);
+      });
+    }
+
+    // ------- شاته تګ -------
+
+    function goBackToMenu() { switchPage('quarterlyFaslPage', 'menuPage'); }
+    function goBackToQuarterlyFasl() { switchPage('quarterlyViewPage', 'quarterlyFaslPage'); }
+
+    function goBackFromResult() {
+      document.getElementById('aeText').value = '';
+      document.getElementById('result-page-msg').style.display = 'none';
+      updateCharCounter();
+      if (resultOrigin === 'quarterlyViewPage') {
+        switchPage('resultPage', 'quarterlyViewPage');
+      } else {
+        switchPage('resultPage', 'menuPage');
+      }
+    }
+
+    function goBackToSearch() {
+      switchPage('menuPage', 'searchPage');
+      setTimeout(function () {
+        document.getElementById('basisNum').value = '';
+        document.getElementById('studentCode').value = '';
+        document.getElementById('basisNum').focus();
+        sessionToken = null;
+        currentBasisNum = '';
+      }, 500);
+    }
+  </script>
+
+</body>
+</html>
