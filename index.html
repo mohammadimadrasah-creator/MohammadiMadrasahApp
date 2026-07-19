@@ -102,7 +102,7 @@
     .btn-clear-wrapper { display: flex; justify-content: center; width: 100%; margin-top: 5px; }
     .btn-clear { padding: 10px 20px; background: #e5e9e6; color: #a91e1e; border: 2px solid #b2c4ba; border-radius: 10px; font-family: 'Vazirmatn', sans-serif; font-size: 16px; font-weight: 800; cursor: pointer; }
 
-    #loading, #loading-submit, #loading-section { display: none; text-align: center; margin: 20px 0; color: var(--primary-color); font-weight: 900; font-size: 22px; }
+    #loading, #loading-submit, #loading-section, #loading-month { display: none; text-align: center; margin: 20px 0; color: var(--primary-color); font-weight: 900; font-size: 22px; }
     .animated-dots span { display: inline-block; animation: realTimeDots 1.4s infinite both; font-size: 26px; }
     @keyframes realTimeDots { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
 
@@ -211,7 +211,27 @@
       <div id="loading-section">❖ د معلوماتو د لټون په حال کې<span class="animated-dots"><span>.</span><span>.</span><span>.</span></span></div>
     </div>
 
-    <!-- ۳) د فصل انتخاب (یوازې د ۶م برخې لپاره) -->
+    <!-- ۳) د میاشتې انتخاب (یوازې د میاشتنۍ ارزونې او سوبتیا لپاره) -->
+    <div id="monthPickerPage" class="app-page">
+      <div class="menu-group">
+        <button class="btn-menu-opt" onclick="selectMonth('حمل', this)">حمل</button>
+        <button class="btn-menu-opt" onclick="selectMonth('ثور', this)">ثور</button>
+        <button class="btn-menu-opt" onclick="selectMonth('جوزا', this)">جوزا</button>
+        <button class="btn-menu-opt" onclick="selectMonth('سرطان', this)">سرطان</button>
+        <button class="btn-menu-opt" onclick="selectMonth('اسد', this)">اسد</button>
+        <button class="btn-menu-opt" onclick="selectMonth('سنبله', this)">سنبله</button>
+        <button class="btn-menu-opt" onclick="selectMonth('میزان', this)">میزان</button>
+        <button class="btn-menu-opt" onclick="selectMonth('عقرب', this)">عقرب</button>
+        <button class="btn-menu-opt" onclick="selectMonth('قوس', this)">قوس</button>
+        <button class="btn-menu-opt" onclick="selectMonth('جدی', this)">جدی</button>
+        <button class="btn-menu-opt" onclick="selectMonth('دلو', this)">دلو</button>
+        <button class="btn-menu-opt" onclick="selectMonth('حوت', this)">حوت</button>
+      </div>
+      <button class="btn-back" onclick="history.back()">مخکینۍ صفحې ته تګ</button>
+      <div id="loading-month">❖ د معلوماتو د لټون په حال کې<span class="animated-dots"><span>.</span><span>.</span><span>.</span></span></div>
+    </div>
+
+    <!-- ۴) د فصل انتخاب (یوازې د ۶م برخې لپاره) -->
     <div id="quarterlyFaslPage" class="app-page">
       <div class="menu-group">
         <button class="btn-menu-opt" onclick="selectQuarter('q1', this)">لومړۍ فصل</button>
@@ -251,7 +271,7 @@
   </div>
 
   <script>
-    var webAppUrl = "PASTE_YOUR_NEW_EXEC_LINK_HERE";
+    var webAppUrl = "https://script.google.com/macros/s/AKfycbzDiAKMiXoDz53JQ7tpMGje1MQjUnhptIciTIY-iwTVySqGYXRQp9dXoUWNXcffvwHjkA/exec";
 
     var currentBasisNum = "";
     var sessionToken = null;
@@ -402,10 +422,21 @@
         currentSection = section;
         if (section === 'quarterly') {
           goTo('quarterlyFaslPage');
+        } else if (section === 'monthly' || section === 'attendance') {
+          goTo('monthPickerPage');
         } else {
           resultOrigin = 'menuPage';
           fetchSectionData({ section: section });
         }
+      }, 250);
+    }
+
+    function selectMonth(monthName, buttonElement) {
+      buttonElement.classList.add('btn-clicked');
+      setTimeout(function () {
+        buttonElement.classList.remove('btn-clicked');
+        resultOrigin = 'monthPickerPage';
+        fetchSectionData({ section: currentSection, month: monthName });
       }, 250);
     }
 
@@ -430,25 +461,21 @@
     // ------- ډاټا راوړل -------
 
     function fetchSectionData(extra) {
-      var loadingId = (resultOrigin === 'quarterlyViewPage') ? 'loading-quarterly' : 'loading-section';
+      var loadingId = 'loading-section';
+      if (resultOrigin === 'quarterlyViewPage') loadingId = 'loading-quarterly';
+      else if (resultOrigin === 'monthPickerPage') loadingId = 'loading-month';
       var loadingEl = document.getElementById(loadingId);
-
-      // دا دوه برخې ډیر فایلونه لري، نو ښایي ډیر وخت ونیسي
-      var heavySection = (extra.section === 'monthly' || extra.section === 'attendance');
-      loadingEl.innerHTML = heavySection
-        ? '❖ دا برخه ډیری فایلونه لري، ښایي تر ۱ دقیقې پورې وخت ونیسي، مهرباني وکړئ صبر وکړئ<span class="animated-dots"><span>.</span><span>.</span><span>.</span></span>'
-        : '❖ د معلوماتو د لټون په حال کې<span class="animated-dots"><span>.</span><span>.</span><span>.</span></span>';
+      loadingEl.innerHTML = '❖ د معلوماتو د لټون په حال کې<span class="animated-dots"><span>.</span><span>.</span><span>.</span></span>';
       loadingEl.style.display = 'block';
       hideError();
 
       var payload = Object.assign({ action: "getSection", basisNumber: currentBasisNum, token: sessionToken }, extra);
-      var timeoutMs = heavySection ? 110000 : 30000;
 
       fetchWithTimeout(webAppUrl, {
         method: "POST", mode: "cors",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify(payload)
-      }, timeoutMs)
+      }, 45000)
       .then(function (res) { return res.json(); })
       .then(function (response) {
         loadingEl.style.display = 'none';
