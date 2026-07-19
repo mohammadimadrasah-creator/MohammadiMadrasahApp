@@ -75,6 +75,13 @@
     @keyframes smoothShow { 0% { opacity: 0; transform: translateX(15px); filter: blur(4px); } 35%, 85% { opacity: 1; transform: translateX(0); filter: blur(0); } 100% { opacity: 0; transform: translateX(-15px); filter: blur(4px); } }
     .logo-center-container { width: 28%; text-align: center; vertical-align: middle; }
     .logo-img { width: 220px; height: 220px; object-fit: contain; filter: drop-shadow(0 8px 16px rgba(6, 38, 31, 0.18)); }
+    @keyframes logoEntrance {
+      0% { opacity: 0; transform: scale(0.4) rotate(-18deg); filter: drop-shadow(0 8px 16px rgba(6,38,31,0.18)) blur(10px); }
+      55% { opacity: 1; transform: scale(1.12) rotate(4deg); filter: drop-shadow(0 8px 16px rgba(6,38,31,0.18)) blur(0); }
+      75% { transform: scale(0.96) rotate(-2deg); }
+      100% { opacity: 1; transform: scale(1) rotate(0deg); }
+    }
+    .logo-img.logo-animate { animation: logoEntrance 1.1s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
 
     .header-table-box { width: 100%; margin: 0 0 30px 0; background: linear-gradient(135deg, var(--primary-color), #031411); padding: 20px; text-align: center; border: 4px double var(--accent-color); border-radius: 14px; }
     .header-table-box h2 { font-family: 'Jomhuria', serif; color: var(--accent-color); margin: 0; font-size: 50px; font-weight: 400; line-height: 1.1; }
@@ -160,7 +167,7 @@
     <table class="header-layout-table">
       <tr>
         <td class="slogan-box slogan-right"><div class="typewriter-text">علم د مؤمن تر ټولو<br>ستره شتمني ده</div></td>
-        <td class="logo-center-container"><img src="https://i.postimg.cc/HWVf6r64/mhmdy-mdrsh.png" alt="د محمدی مدرسې لوګو" class="logo-img"></td>
+        <td class="logo-center-container"><img id="logoImg" src="https://i.postimg.cc/HWVf6r64/mhmdy-mdrsh.png" alt="د محمدی مدرسې لوګو" class="logo-img logo-animate"></td>
         <td class="slogan-box slogan-left"><div class="typewriter-text">د زده کوونکو بریا<br>زموږ هیله ده</div></td>
       </tr>
     </table>
@@ -193,12 +200,12 @@
     <!-- ۲) اصلي منو (۶ برخې) -->
     <div id="menuPage" class="app-page">
       <div class="menu-group">
-        <button class="btn-menu-opt" onclick="animateAndSelectSection('profile', this)">۱. د زده کوونکي مشخصات</button>
-        <button class="btn-menu-opt" onclick="animateAndSelectSection('fee', this)">۲. فیس</button>
-        <button class="btn-menu-opt" onclick="animateAndSelectSection('monthly', this)">۳. میاشتنۍ ارزونه</button>
-        <button class="btn-menu-opt" onclick="animateAndSelectSection('examGrades', this)">۴. د آزموینې نمرات</button>
-        <button class="btn-menu-opt" onclick="animateAndSelectSection('attendance', this)">۵. سوبتیا</button>
-        <button class="btn-menu-opt" onclick="animateAndSelectSection('quarterly', this)">۶. څلور میاشتینۍ ارزونه</button>
+        <button class="btn-menu-opt" onclick="animateAndSelectSection('profile', this)">د زده کوونکي مشخصات</button>
+        <button class="btn-menu-opt" onclick="animateAndSelectSection('fee', this)">فیس</button>
+        <button class="btn-menu-opt" onclick="animateAndSelectSection('monthly', this)">میاشتنۍ ارزونه</button>
+        <button class="btn-menu-opt" onclick="animateAndSelectSection('examGrades', this)">د آزموینې نمرات</button>
+        <button class="btn-menu-opt" onclick="animateAndSelectSection('attendance', this)">سوبتیا</button>
+        <button class="btn-menu-opt" onclick="animateAndSelectSection('quarterly', this)">څلور میاشتینۍ ارزونه</button>
       </div>
       <button class="btn-back" onclick="goBackToSearch()">له سیسټم څخه وتل</button>
       <div id="loading-section">❖ د معلوماتو د لټون په حال کې<span class="animated-dots"><span>.</span><span>.</span><span>.</span></span></div>
@@ -244,13 +251,14 @@
   </div>
 
   <script>
-    var webAppUrl = "https://script.google.com/macros/s/AKfycbzDiAKMiXoDz53JQ7tpMGje1MQjUnhptIciTIY-iwTVySqGYXRQp9dXoUWNXcffvwHjkA/exec";
+    var webAppUrl = "PASTE_YOUR_NEW_EXEC_LINK_HERE";
 
     var currentBasisNum = "";
     var sessionToken = null;
     var currentSection = null;   // 'profile' | 'fee' | 'monthly' | 'examGrades' | 'attendance' | 'quarterly'
     var currentQuarter = null;   // 'q1' | 'q2' | 'q3'
-    var resultOrigin = null;     // پته چیرته باید له پایلو څخه بیرته لاړ شو
+    var activePage = 'searchPage';
+    var resultOrigin = null;     // یوازې د بارېدو انیکېټر لپاره کارول کیږي (نه د شاته تګ لپاره)
 
     var SECTION_TITLES = {
       profile: "❖ د زده کونکي مشخصات ❖",
@@ -288,6 +296,36 @@
         toPage.style.display = 'block';
         setTimeout(function () { toPage.classList.add('page-active'); }, 20);
       }, 500);
+      activePage = toPageId;
+    }
+
+    // مخکې تګ (Forward): پاڼه بدلوي او یو نوی تاریخچه ثبت کوي
+    function goTo(toPageId) {
+      switchPage(activePage, toPageId);
+      history.pushState({ page: toPageId }, '', location.href);
+    }
+
+    // کله چې کارن د ګرځنده تلیفون یا براوزر شاته تګ تڼۍ فشاروي
+    window.addEventListener('popstate', function (e) {
+      var targetPage = (e.state && e.state.page) ? e.state.page : 'searchPage';
+      if (targetPage === activePage) return;
+      if (activePage === 'resultPage') {
+        document.getElementById('aeText').value = '';
+        document.getElementById('result-page-msg').style.display = 'none';
+      }
+      switchPage(activePage, targetPage);
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+      history.replaceState({ page: 'searchPage' }, '', location.href);
+      playLogoAnimation();
+    });
+
+    function playLogoAnimation() {
+      var logo = document.getElementById('logoImg');
+      logo.classList.remove('logo-animate');
+      void logo.offsetWidth; // د انیمیشن له سره پیلولو لپاره
+      logo.classList.add('logo-animate');
     }
 
     function handleBasisEnter(event) { if (event.key === 'Enter') { event.preventDefault(); document.getElementById('studentCode').focus(); } }
@@ -341,7 +379,8 @@
         btn.disabled = false;
         if (response.success) {
           sessionToken = response.token;
-          switchPage('searchPage', 'menuPage');
+          playLogoAnimation();
+          goTo('menuPage');
         } else {
           showError(response.message || 'معلومات سم نه دي.');
         }
@@ -362,7 +401,7 @@
         buttonElement.classList.remove('btn-clicked');
         currentSection = section;
         if (section === 'quarterly') {
-          switchPage('menuPage', 'quarterlyFaslPage');
+          goTo('quarterlyFaslPage');
         } else {
           resultOrigin = 'menuPage';
           fetchSectionData({ section: section });
@@ -375,7 +414,7 @@
       setTimeout(function () {
         buttonElement.classList.remove('btn-clicked');
         currentQuarter = qKey;
-        switchPage('quarterlyFaslPage', 'quarterlyViewPage');
+        goTo('quarterlyViewPage');
       }, 250);
     }
 
@@ -393,23 +432,29 @@
     function fetchSectionData(extra) {
       var loadingId = (resultOrigin === 'quarterlyViewPage') ? 'loading-quarterly' : 'loading-section';
       var loadingEl = document.getElementById(loadingId);
+
+      // دا دوه برخې ډیر فایلونه لري، نو ښایي ډیر وخت ونیسي
+      var heavySection = (extra.section === 'monthly' || extra.section === 'attendance');
+      loadingEl.innerHTML = heavySection
+        ? '❖ دا برخه ډیری فایلونه لري، ښایي تر ۱ دقیقې پورې وخت ونیسي، مهرباني وکړئ صبر وکړئ<span class="animated-dots"><span>.</span><span>.</span><span>.</span></span>'
+        : '❖ د معلوماتو د لټون په حال کې<span class="animated-dots"><span>.</span><span>.</span><span>.</span></span>';
       loadingEl.style.display = 'block';
       hideError();
 
       var payload = Object.assign({ action: "getSection", basisNumber: currentBasisNum, token: sessionToken }, extra);
+      var timeoutMs = heavySection ? 110000 : 30000;
 
       fetchWithTimeout(webAppUrl, {
         method: "POST", mode: "cors",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify(payload)
-      }, 25000)
+      }, timeoutMs)
       .then(function (res) { return res.json(); })
       .then(function (response) {
         loadingEl.style.display = 'none';
         if (response.success) {
           renderResults(response);
-          var fromPage = resultOrigin === 'quarterlyViewPage' ? 'quarterlyViewPage' : 'menuPage';
-          switchPage(fromPage, 'resultPage');
+          goTo('resultPage');
         } else {
           showError(response.message || 'معلومات ونه موندل شول.');
         }
@@ -519,23 +564,22 @@
     }
 
     // ------- شاته تګ -------
+    // دا فنکشنونه پخپله پاڼه نه بدلوي، یوازې history.back() غږوي —
+    // او هغه popstate پیښه رامنځته کوي چې پاڼه سمه بدلوي.
+    // نو د دلته کلیک کولو او د ګرځنده تلیفون د شاته تګ تڼۍ فشارولو، دواړه یو شان چلند کوي.
 
-    function goBackToMenu() { switchPage('quarterlyFaslPage', 'menuPage'); }
-    function goBackToQuarterlyFasl() { switchPage('quarterlyViewPage', 'quarterlyFaslPage'); }
+    function goBackToMenu() { history.back(); }
+    function goBackToQuarterlyFasl() { history.back(); }
 
     function goBackFromResult() {
       document.getElementById('aeText').value = '';
       document.getElementById('result-page-msg').style.display = 'none';
       updateCharCounter();
-      if (resultOrigin === 'quarterlyViewPage') {
-        switchPage('resultPage', 'quarterlyViewPage');
-      } else {
-        switchPage('resultPage', 'menuPage');
-      }
+      history.back();
     }
 
     function goBackToSearch() {
-      switchPage('menuPage', 'searchPage');
+      goTo('searchPage');
       setTimeout(function () {
         document.getElementById('basisNum').value = '';
         document.getElementById('studentCode').value = '';
